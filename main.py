@@ -8,7 +8,7 @@ def main(filepath):
     ledger = Ledger(
         filepath=filepath,
         filter_by="amount",
-        filter_args="JPY 50"
+        filter_args="JPY 100"
     )
     res = ledger.call()
     print(res)
