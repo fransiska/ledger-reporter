@@ -1,0 +1,7 @@
+2021/08/14 Grocery
+    Expenses:Control:Food:Grocery:Vegetables  JPY 100 ; 人参
+    Liabilities:Card:202109                  JPY -100
+
+2021/08/13 Grocery
+    Expenses:Control:Food:Grocery:Fruits      JPY 300 ; もも
+    Liabilities:Card:202109                  JPY -300
