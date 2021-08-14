@@ -6,10 +6,10 @@ import csv
 
 class Ledger:
     _bin = ["ledger"]
-    _options = ["-w"]
 
-    def __init__(self, filepath, command="reg", print_format=None, filter_by=None, filter_args=None, accounts=""):
+    def __init__(self, filepath, command="reg", options=["-w"], print_format=None, filter_by=None, filter_args=None, accounts=""):
         self._command = command
+        self._options = options
         self._filepath = self.parse_filepath(filepath)
         self._print_format = print_format
         self._filter_by = filter_by
