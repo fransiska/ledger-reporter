@@ -61,6 +61,7 @@ class Ledger:
                 "%(quoted(join(note | xact.note)))\n"
         else:
             return "%(quoted(date)),%(quoted(payee)),"\
+                "%(quoted(display_account))," \
                 "%(quoted(commodity(scrub(display_amount))))," \
                 "%(quoted(quantity(scrub(display_amount))))," \
                 "%(quoted(note))\n"
@@ -76,20 +77,23 @@ class Ledger:
         elif command == "csv":
             return ["date","code","payee","account","commodity","quantity","cleared","note"]
         else:
-            return ["date","payee","commodity","quantity","note"]
+            return ["date","payee","account","commodity","quantity","note"]
 
     @staticmethod
     def generate_filter(filter_by, filter_args):
+        if not filter_by:
+            return []
+
         if filter_by == "amount":
             if not filter_args.startswith(("<",">","=")):
                 filter_args = "== " + filter_args
             return ["expr", 'amount {}'.format(filter_args)]
-        elif filter_by == "payee":
-            return ["payee", filter_args]
+        elif "payee" in filter_by:
+            return filter_by.split(" ") + [filter_args]
         elif filter_by == "comment":
             return ["expr", "comment=~/{}/".format(filter_args)]
         else:
-            return []
+            raise Exeption("Filter not supported")
 
     @staticmethod
     def generate_query(filter_expr, accounts):
