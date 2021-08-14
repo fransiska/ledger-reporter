@@ -68,4 +68,4 @@ class Ledger:
 
     def call(self, encoding="utf8"):
         res = subprocess.run(self.generate_command(), capture_output=True, encoding=encoding)
-        return res.stdout
+        return res.stdout.splitlines()

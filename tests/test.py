@@ -12,7 +12,12 @@ class LedgerTest(unittest.TestCase):
             filepath=FILEPATH,
             command="bal"
         ).call()
-        self.assertEqual(res, "Expenses:Control:Food:Grocery JPY 400\nExpenses:Control:Food:Grocery:Fruits JPY 300\nExpenses:Control:Food:Grocery:Vegetables JPY 100\nLiabilities:Card:202109 JPY -400\n 0\n")
+        self.assertListEqual(res, [
+            "Expenses:Control:Food:Grocery JPY 400",
+            "Expenses:Control:Food:Grocery:Fruits JPY 300",
+            "Expenses:Control:Food:Grocery:Vegetables JPY 100",
+            "Liabilities:Card:202109 JPY -400",
+            " 0"])
 
     def test_account_filtered_balance_result(self):
         res = Ledger(
@@ -20,14 +25,22 @@ class LedgerTest(unittest.TestCase):
             command="bal",
             accounts="Expenses:Control"
         ).call()
-        self.assertEqual(res, "Expenses:Control:Food:Grocery JPY 400\nExpenses:Control:Food:Grocery:Fruits JPY 300\nExpenses:Control:Food:Grocery:Vegetables JPY 100\n JPY 400\n")
+        self.assertEqual(res, [
+            "Expenses:Control:Food:Grocery JPY 400",
+            "Expenses:Control:Food:Grocery:Fruits JPY 300",
+            "Expenses:Control:Food:Grocery:Vegetables JPY 100",
+            " JPY 400"])
 
     def test_default_csv_result(self):
         res = Ledger(
             filepath=FILEPATH,
             command="csv"
         ).call()
-        self.assertEqual(res, '"2021/08/14","","Grocery","Expenses:Control:Food:Grocery:Vegetables","JPY","100",""," 人参"\n"2021/08/14","","Grocery","Liabilities:Card:202109","JPY","-100","",""\n"2021/08/13","","Grocery","Expenses:Control:Food:Grocery:Fruits","JPY","300",""," もも"\n"2021/08/13","","Grocery","Liabilities:Card:202109","JPY","-300","",""\n')
+        self.assertEqual(res, [
+            '"2021/08/14","","Grocery","Expenses:Control:Food:Grocery:Vegetables","JPY","100",""," 人参"',
+            '"2021/08/14","","Grocery","Liabilities:Card:202109","JPY","-100","",""',
+            '"2021/08/13","","Grocery","Expenses:Control:Food:Grocery:Fruits","JPY","300",""," もも"',
+            '"2021/08/13","","Grocery","Liabilities:Card:202109","JPY","-300","",""'])
 
     def test_amount_and_account_filtered_csv_result(self):
         res = Ledger(
@@ -36,7 +49,8 @@ class LedgerTest(unittest.TestCase):
             filter_by="amount",
             filter_args="JPY 100"
         ).call()
-        self.assertEqual(res, '"2021/08/14","","Grocery","Expenses:Control:Food:Grocery:Vegetables","JPY","100",""," 人参"\n')
+        self.assertListEqual(res, [
+            '"2021/08/14","","Grocery","Expenses:Control:Food:Grocery:Vegetables","JPY","100",""," 人参"'])
 
     def test_amount_filtered_plain_reg_result(self):
         res = Ledger(
@@ -45,4 +59,4 @@ class LedgerTest(unittest.TestCase):
             filter_by="amount",
             filter_args="JPY 100"
         ).call()
-        self.assertEqual(res, '2021/08/14 Grocery JPY 100  人参\n')
+        self.assertListEqual(res, ["2021/08/14 Grocery JPY 100  人参"])
