@@ -27,6 +27,11 @@ def main(filepath):
             command="reg",
             filter_by="amount",
             filter_args="JPY 100"
+        ),
+        Ledger(
+            filepath=filepath,
+            command="bal",
+            accounts=["Food","House"]
         )
     ]
     for ledger in ledgers:

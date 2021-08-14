@@ -94,6 +94,19 @@ class LedgerTest(unittest.TestCase):
             ["2021/08/14","Daiso","JPY","100"," Sponge"]
         ])
 
+    def test_multiple_files(self):
+        res = Ledger(
+            filepath=[FILEPATH, FILEPATH2],
+            command="reg",
+            accounts=["Food","House"]
+        ).call()
+        self.assertListEqual(res, [
+            ["date", "payee", "commodity", "quantity", "note"],
+            ["2021/08/14","Grocery","JPY","100"," 人参"],
+            ["2021/08/13","Grocery","JPY","300"," もも"],
+            ["2021/08/14","Daiso","JPY","100"," Sponge"]
+        ])
+
 class LedgerReportTest(unittest.TestCase):
     def test_assert_balance(self):
         res = Ledger(

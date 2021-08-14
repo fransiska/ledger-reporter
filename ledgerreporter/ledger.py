@@ -94,9 +94,9 @@ class Ledger:
     @staticmethod
     def generate_query(filter_expr, accounts):
         if filter_expr and accounts:
-            return filter_expr + ["and " + "and".join(accounts)]
+            return filter_expr + [" and {}".format(accounts)]
         elif accounts:
-            return ["and".join(accounts)]
+            return accounts
         else:
             return filter_expr or []
 
