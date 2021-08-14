@@ -17,7 +17,9 @@ class Ledger:
     @staticmethod
     def generate_filter(filter_by, filter_args):
         if filter_by == "amount":
-            return ["expr", '"amount == {}"'.format(filter_args)]
+            if not filter_args.startswith(("<",">","=")):
+                filter_args = "== " + filter_args
+            return ["expr", '"amount {}"'.format(filter_args)]
         elif filter_by == "payee":
             return ["payee", filter_args]
         elif filter_by == "comment":
