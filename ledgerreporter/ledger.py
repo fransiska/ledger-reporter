@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-import sys
 import subprocess
 
 class Ledger:
@@ -22,7 +21,7 @@ class Ledger:
         elif filter_by == "payee":
             return ["payee", filter_args]
         elif filter_by == "comment":
-            return ["expr", '"comment=~/{}/"'.format(filter_args)]
+            return ["expr", "comment=~/{}/".format(filter_args)]
         else:
             return []
 
@@ -32,18 +31,3 @@ class Ledger:
     def call(self, encoding="utf8"):
         res = subprocess.run(self.generate_command(), capture_output=True, encoding=encoding)
         return res.stdout.splitlines()
-
-def main(filepath):
-    ledger = Ledger(
-        filepath=filepath,
-        filter_by="amount",
-        filter_args="JPY 50"
-    )
-    res = ledger.call()
-    print(res)
-
-if __name__ == "__main__":
-    if len(sys.argv) > 1:
-        main(sys.argv[1])
-    else:
-        print("Usage: python ledger.py <ledger_file>")
