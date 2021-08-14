@@ -14,7 +14,7 @@ class Ledger:
         self._print_format = print_format
         self._filter_by = filter_by
         self._filter_args = filter_args
-        self._accounts = [accounts] if accounts else []
+        self._accounts = accounts
 
     @staticmethod
     def get_format_keyword(command):
@@ -75,9 +75,9 @@ class Ledger:
     @staticmethod
     def generate_query(filter_expr, accounts):
         if filter_expr and accounts:
-            return filter_expr + ["and"] + accounts
+            return filter_expr + ["and {}".format(accounts)]
         else:
-            return filter_expr or accounts
+            return filter_expr or [accounts]
 
     def generate_command(self):
         return self._bin + \

@@ -45,10 +45,22 @@ class LedgerTest(unittest.TestCase):
             ["2021/08/13","","Grocery","Expenses:Control:Food:Grocery:Fruits","JPY","300",""," もも"],
             ["2021/08/13","","Grocery","Liabilities:Card:202109","JPY","-300","",""]])
 
+    def test_amount_filtered_csv_result(self):
+        res = Ledger(
+            filepath=FILEPATH,
+            command="csv",
+            filter_by="amount",
+            filter_args="JPY 100"
+        ).call()
+        self.assertListEqual(res, [
+            ["date", "code", "payee", "account", "commodity", "quantity", "cleared", "note"],
+            ["2021/08/14","","Grocery","Expenses:Control:Food:Grocery:Vegetables","JPY","100",""," 人参"]])
+
     def test_amount_and_account_filtered_csv_result(self):
         res = Ledger(
             filepath=FILEPATH,
             command="csv",
+            accounts="Expenses:Control",
             filter_by="amount",
             filter_args="JPY 100"
         ).call()

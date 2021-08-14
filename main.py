@@ -13,6 +13,7 @@ def main(filepath):
         ),
         Ledger(
             filepath=filepath,
+            accounts="Expenses",
             filter_by="amount",
             filter_args="JPY 100"
         ),
