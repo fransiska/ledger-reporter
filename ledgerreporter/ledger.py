@@ -10,11 +10,21 @@ class Ledger:
 
     def __init__(self, filepath, command="reg", print_format=None, filter_by=None, filter_args=None, accounts=""):
         self._command = command
-        self._filepath = ["-f", filepath]
+        self._filepath = self.parse_filepath(filepath)
         self._print_format = print_format
         self._filter_by = filter_by
         self._filter_args = filter_args
         self._accounts = accounts
+
+    @staticmethod
+    def parse_filepath(filepath):
+        if isinstance(filepath, list):
+            array = []
+            for f in filepath:
+                array += ["-f", f]
+            return array
+        else:
+            return ["-f", filepath]
 
     @staticmethod
     def get_format_keyword(command):
