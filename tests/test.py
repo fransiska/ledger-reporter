@@ -3,6 +3,7 @@
 
 import unittest
 from ledgerreporter.ledger import Ledger
+import ledgerreporter.reporter as reporter
 
 FILEPATH = "tests/test.ledger"
 
@@ -78,3 +79,12 @@ class LedgerTest(unittest.TestCase):
         self.assertListEqual(res, [
             ['date', 'payee', 'commodity', 'quantity', 'note'],
             ["2021/08/14","Grocery","JPY","100"," 人参"]])
+
+class LedgerReportTest(unittest.TestCase):
+    def test_assert_balance(self):
+        res = Ledger(
+            filepath=FILEPATH,
+            command="bal",
+            accounts="Liabilities:Card:202109"
+        ).call()
+        self.assertTrue(reporter.assert_balance(res, -400))
