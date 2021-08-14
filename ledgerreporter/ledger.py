@@ -83,7 +83,7 @@ class Ledger:
         if filter_by == "amount":
             if not filter_args.startswith(("<",">","=")):
                 filter_args = "== " + filter_args
-            return ["expr", '"amount {}"'.format(filter_args)]
+            return ["expr", 'amount {}'.format(filter_args)]
         elif filter_by == "payee":
             return ["payee", filter_args]
         elif filter_by == "comment":
@@ -94,7 +94,7 @@ class Ledger:
     @staticmethod
     def generate_query(filter_expr, accounts):
         if filter_expr and accounts:
-            return filter_expr + [" and {}".format(accounts)]
+            return filter_expr + ["and", accounts[0]]
         elif accounts:
             return accounts
         else:
