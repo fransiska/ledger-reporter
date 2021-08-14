@@ -27,7 +27,7 @@ class Ledger:
     @staticmethod
     def get_default_format(command):
         if command == "bal":
-            return "%(account) %(amount)\n"
+            return "%(account) %(total)\n"
         elif command == "csv":
             return "%(quoted(date))," \
                 "%(quoted(code))," \
