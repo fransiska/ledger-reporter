@@ -21,7 +21,14 @@ def main(filepath):
             filepath=filepath,
             command="csv",
             accounts="Expenses"
-        )]
+        ),
+        Ledger(
+            filepath=filepath,
+            command="reg",
+            filter_by="amount",
+            filter_args="JPY 100"
+        )
+    ]
     for ledger in ledgers:
         print("*",ledger._command)
         res = ledger.call()
@@ -30,6 +37,6 @@ def main(filepath):
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
-        main(sys.argv[1])
+        main(sys.argv[1:])
     else:
         print("Usage: python ledger.py <ledger_file>")

@@ -14,7 +14,16 @@ class Ledger:
         self._print_format = print_format
         self._filter_by = filter_by
         self._filter_args = filter_args
-        self._accounts = accounts
+        self._accounts = self.parse_accounts(accounts)
+
+    @staticmethod
+    def parse_accounts(accounts):
+        if isinstance(accounts, list):
+            return accounts
+        elif accounts:
+            return [accounts]
+        else:
+            return []
 
     @staticmethod
     def parse_filepath(filepath):
@@ -85,9 +94,11 @@ class Ledger:
     @staticmethod
     def generate_query(filter_expr, accounts):
         if filter_expr and accounts:
-            return filter_expr + ["and {}".format(accounts)]
+            return filter_expr + ["and " + "and".join(accounts)]
+        elif accounts:
+            return ["and".join(accounts)]
         else:
-            return filter_expr or [accounts]
+            return filter_expr or []
 
     def generate_command(self):
         return self._bin + \

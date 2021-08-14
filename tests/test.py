@@ -6,6 +6,7 @@ from ledgerreporter.ledger import Ledger
 import ledgerreporter.reporter as reporter
 
 FILEPATH = "tests/test.ledger"
+FILEPATH2 = "tests/test2.ledger"
 
 class LedgerTest(unittest.TestCase):
     def test_default_balance_result(self):
@@ -77,8 +78,21 @@ class LedgerTest(unittest.TestCase):
             filter_args="JPY 100"
         ).call()
         self.assertListEqual(res, [
-            ['date', 'payee', 'commodity', 'quantity', 'note'],
+            ["date", "payee", "commodity", "quantity", "note"],
             ["2021/08/14","Grocery","JPY","100"," 人参"]])
+
+    def test_multiple_files(self):
+        res = Ledger(
+            filepath=[FILEPATH, FILEPATH2],
+            command="reg",
+            filter_by="amount",
+            filter_args="JPY 100"
+        ).call()
+        self.assertListEqual(res, [
+            ["date", "payee", "commodity", "quantity", "note"],
+            ["2021/08/14","Grocery","JPY","100"," 人参"],
+            ["2021/08/14","Daiso","JPY","100"," Sponge"]
+        ])
 
 class LedgerReportTest(unittest.TestCase):
     def test_assert_balance(self):
