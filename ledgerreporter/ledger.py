@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import subprocess
+import csv
 
 class Ledger:
     _bin = ["ledger"]
@@ -27,7 +28,9 @@ class Ledger:
     @staticmethod
     def get_default_format(command):
         if command == "bal":
-            return "%(account) %(total)\n"
+            return "%(quoted(account))," \
+                "%(quoted(commodity(scrub(display_total))))," \
+                "%(quoted(quantity(scrub(display_total))))\n"
         elif command == "csv":
             return "%(quoted(date))," \
                 "%(quoted(code))," \
@@ -38,7 +41,10 @@ class Ledger:
                 "%(quoted(cleared ? \"*\" : (pending ? \"!\" : \"\")))," \
                 "%(quoted(join(note | xact.note)))\n"
         else:
-            return "%(date) %(payee) %(amount) %(note)\\n"
+            return "%(quoted(date)),%(quoted(payee)),"\
+                "%(quoted(commodity(scrub(display_amount))))," \
+                "%(quoted(quantity(scrub(display_amount))))," \
+                "%(quoted(note))\n"
 
     @staticmethod
     def generate_filter(filter_by, filter_args):
@@ -68,4 +74,4 @@ class Ledger:
 
     def call(self, encoding="utf8"):
         res = subprocess.run(self.generate_command(), capture_output=True, encoding=encoding)
-        return res.stdout.splitlines()
+        return list(csv.reader(res.stdout.splitlines()))
