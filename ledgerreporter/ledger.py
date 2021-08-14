@@ -9,9 +9,9 @@ class Ledger:
     _options = ["-w"]
 
     def __init__(self, filepath, command="reg", print_format=None, filter_by=None, filter_args=None, accounts=""):
-        self._command = [command]
+        self._command = command
         self._filepath = ["-f", filepath]
-        self._print_format = [self.get_format_keyword(command), print_format if print_format else self.get_default_format(command)]
+        self._print_format = print_format
         self._filter_by = filter_by
         self._filter_args = filter_args
         self._accounts = [accounts] if accounts else []
@@ -46,6 +46,19 @@ class Ledger:
                 "%(quoted(quantity(scrub(display_amount))))," \
                 "%(quoted(note))\n"
 
+    @classmethod
+    def generate_print_format(cls, command, print_format):
+        return [cls.get_format_keyword(command), print_format if print_format else cls.get_default_format(command)]
+
+    @staticmethod
+    def get_default_header(command):
+        if command == "bal":
+            return ["account","commodity","quantity"]
+        elif command == "csv":
+            return ["date","code","payee","account","commodity","quantity","cleared","note"]
+        else:
+            return ["date","payee","commodity","quantity","note"]
+
     @staticmethod
     def generate_filter(filter_by, filter_args):
         if filter_by == "amount":
@@ -68,10 +81,14 @@ class Ledger:
 
     def generate_command(self):
         return self._bin + \
-            self._command + self._options + \
+            [self._command] + self._options + \
             self.generate_query(self.generate_filter(self._filter_by, self._filter_args), self._accounts) + \
-            self._print_format + self._filepath
+            self.generate_print_format(self._command, self._print_format) + \
+            self._filepath
 
     def call(self, encoding="utf8"):
         res = subprocess.run(self.generate_command(), capture_output=True, encoding=encoding)
-        return list(csv.reader(res.stdout.splitlines()))
+        data = list(csv.reader(res.stdout.splitlines()))
+        if not self._print_format:
+            data.insert(0, self.get_default_header(self._command))
+        return data

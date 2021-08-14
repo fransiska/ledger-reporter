@@ -13,6 +13,7 @@ class LedgerTest(unittest.TestCase):
             command="bal"
         ).call()
         self.assertListEqual(res, [
+            ["account", "commodity", "quantity"],
             ["Expenses:Control:Food:Grocery","JPY","400"],
             ["Expenses:Control:Food:Grocery:Fruits","JPY","300"],
             ["Expenses:Control:Food:Grocery:Vegetables","JPY","100"],
@@ -26,6 +27,7 @@ class LedgerTest(unittest.TestCase):
             accounts="Expenses:Control"
         ).call()
         self.assertEqual(res, [
+            ["account", "commodity", "quantity"],
             ["Expenses:Control:Food:Grocery","JPY","400"],
             ["Expenses:Control:Food:Grocery:Fruits","JPY","300"],
             ["Expenses:Control:Food:Grocery:Vegetables","JPY","100"],
@@ -37,6 +39,7 @@ class LedgerTest(unittest.TestCase):
             command="csv"
         ).call()
         self.assertEqual(res, [
+            ["date", "code", "payee", "account", "commodity", "quantity", "cleared", "note"],
             ["2021/08/14","","Grocery","Expenses:Control:Food:Grocery:Vegetables","JPY","100",""," 人参"],
             ["2021/08/14","","Grocery","Liabilities:Card:202109","JPY","-100","",""],
             ["2021/08/13","","Grocery","Expenses:Control:Food:Grocery:Fruits","JPY","300",""," もも"],
@@ -50,6 +53,7 @@ class LedgerTest(unittest.TestCase):
             filter_args="JPY 100"
         ).call()
         self.assertListEqual(res, [
+            ["date", "code", "payee", "account", "commodity", "quantity", "cleared", "note"],
             ["2021/08/14","","Grocery","Expenses:Control:Food:Grocery:Vegetables","JPY","100",""," 人参"]])
 
     def test_amount_filtered_plain_reg_result(self):
@@ -59,4 +63,6 @@ class LedgerTest(unittest.TestCase):
             filter_by="amount",
             filter_args="JPY 100"
         ).call()
-        self.assertListEqual(res, [["2021/08/14","Grocery","JPY","100"," 人参"]])
+        self.assertListEqual(res, [
+            ['date', 'payee', 'commodity', 'quantity', 'note'],
+            ["2021/08/14","Grocery","JPY","100"," 人参"]])

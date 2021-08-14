@@ -22,7 +22,7 @@ def main(filepath):
             accounts="Expenses"
         )]
     for ledger in ledgers:
-        print("*",ledger._command[0])
+        print("*",ledger._command)
         res = ledger.call()
         for l in res:
             print(l)
