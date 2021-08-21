@@ -20,3 +20,7 @@ I've been checking my budget and expenses using [ledger-dashboard](https://githu
       - <year>
         - <year><month>.ledger
     ```
+
+### Test
+
+- `./runtest.sh`

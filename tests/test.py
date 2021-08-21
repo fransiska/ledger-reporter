@@ -78,10 +78,10 @@ class LedgerTest(unittest.TestCase):
             filter_args="JPY 100"
         ).call()
         self.assertListEqual(res, [
-            ["date", "payee", "commodity", "quantity", "note"],
-            ["2021/08/14","Grocery","JPY","100"," 人参"]])
+            ["date", "payee", "account", "commodity", "quantity", "note"],
+            ["2021/08/14","Grocery","Expenses:Control:Food:Grocery:Vegetables","JPY","100"," 人参"]])
 
-    def test_multiple_files(self):
+    def test_multiple_files_filtered_by_amount(self):
         res = Ledger(
             filepath=[FILEPATH, FILEPATH2],
             command="reg",
@@ -89,22 +89,22 @@ class LedgerTest(unittest.TestCase):
             filter_args="JPY 100"
         ).call()
         self.assertListEqual(res, [
-            ["date", "payee", "commodity", "quantity", "note"],
-            ["2021/08/14","Grocery","JPY","100"," 人参"],
-            ["2021/08/14","Daiso","JPY","100"," Sponge"]
+            ["date", "payee", "account", "commodity", "quantity", "note"],
+            ["2021/08/14","Grocery","Expenses:Control:Food:Grocery:Vegetables","JPY","100"," 人参"],
+            ["2021/08/14","Daiso","Expenses:Control:House","JPY","100"," Sponge"]
         ])
 
-    def test_multiple_files(self):
+    def test_multiple_files_filtered_by_account(self):
         res = Ledger(
             filepath=[FILEPATH, FILEPATH2],
             command="reg",
             accounts=["Food","House"]
         ).call()
         self.assertListEqual(res, [
-            ["date", "payee", "commodity", "quantity", "note"],
-            ["2021/08/14","Grocery","JPY","100"," 人参"],
-            ["2021/08/13","Grocery","JPY","300"," もも"],
-            ["2021/08/14","Daiso","JPY","100"," Sponge"]
+            ["date", "payee", "account", "commodity", "quantity", "note"],
+            ["2021/08/14","Grocery","Expenses:Control:Food:Grocery:Vegetables","JPY","100"," 人参"],
+            ["2021/08/13","Grocery","Expenses:Control:Food:Grocery:Fruits","JPY","300"," もも"],
+            ["2021/08/14","Daiso","Expenses:Control:House","JPY","100"," Sponge"]
         ])
 
 class LedgerReportTest(unittest.TestCase):
