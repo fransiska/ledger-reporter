@@ -56,14 +56,32 @@ class LedgerTest(unittest.TestCase):
             {'date': '2021/08/13', 'payee': 'Grocery', 'account': 'Expenses:Control:Food:Grocery:Fruits', 'commodity': 'JPY', 'quantity': '300', 'note': ' もも'}
         ])
 
-    def test_register_amount_and_accounts_filtered(self):
+    def test_register_amount_and_single_account_filtered(self):
         res = register(LedgerOptions(files=[FILEPATH, FILEPATH2], accounts=["Food"], amount="== JPY 300"))
         self.assertListEqual(res, [
             {'date': '2021/08/13', 'payee': 'Grocery', 'account': 'Expenses:Control:Food:Grocery:Fruits', 'commodity': 'JPY', 'quantity': '300', 'note': ' もも'}
         ])
 
-    def test_register_amount_and_accounts_filtered(self):
+    def test_register_amount_and_multiple_accounts_filtered(self):
         res = register(LedgerOptions(files=[FILEPATH, FILEPATH2], accounts=["Food","House"], amount="== JPY 300"))
         self.assertListEqual(res, [
             {'date': '2021/08/13', 'payee': 'Grocery', 'account': 'Expenses:Control:Food:Grocery:Fruits', 'commodity': 'JPY', 'quantity': '300', 'note': ' もも'}
+        ])
+
+    def test_register_payee_and_multiple_accounts_filtered(self):
+        res = register(LedgerOptions(files=[FILEPATH, FILEPATH2], payee="Daiso", amount="== JPY 100"))
+        self.assertListEqual(res, [
+            {'date': '2021/08/14', 'payee': 'Daiso', 'account': 'Expenses:Control:House', 'commodity': 'JPY', 'quantity': '100', 'note': ' Sponge'}
+        ])
+
+    def test_register_not_payee_and_amount(self):
+        res = register(LedgerOptions(files=[FILEPATH, FILEPATH2], payee="not Daiso", amount="== JPY 100"))
+        self.assertListEqual(res, [
+            {'date': '2021/08/14', 'payee': 'Grocery', 'account': 'Expenses:Control:Food:Grocery:Vegetables', 'commodity': 'JPY', 'quantity': '100', 'note': ' 人参'}
+        ])
+
+    def test_register_payee_amount_accounts(self):
+        res = register(LedgerOptions(files=[FILEPATH, FILEPATH2], payee="not Daiso", amount="== JPY 100", accounts="^Expenses:Control"))
+        self.assertListEqual(res, [
+            {'date': '2021/08/14', 'payee': 'Grocery', 'account': 'Expenses:Control:Food:Grocery:Vegetables', 'commodity': 'JPY', 'quantity': '100', 'note': ' 人参'}
         ])
