@@ -17,3 +17,4 @@ I've been checking my budget and expenses using [ledger-dashboard](https://githu
 ### Test
 
 - `./runtest.sh`
+- Also refer to `tests/test.py` for more usage examples
