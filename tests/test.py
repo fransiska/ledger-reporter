@@ -62,3 +62,8 @@ class LedgerTest(unittest.TestCase):
             {'date': '2021/08/13', 'payee': 'Grocery', 'account': 'Expenses:Control:Food:Grocery:Fruits', 'commodity': 'JPY', 'quantity': '300', 'note': ' もも'}
         ])
 
+    def test_register_amount_and_accounts_filtered(self):
+        res = register(LedgerOptions(files=[FILEPATH, FILEPATH2], accounts=["Food","House"], amount="== JPY 300"))
+        self.assertListEqual(res, [
+            {'date': '2021/08/13', 'payee': 'Grocery', 'account': 'Expenses:Control:Food:Grocery:Fruits', 'commodity': 'JPY', 'quantity': '300', 'note': ' もも'}
+        ])

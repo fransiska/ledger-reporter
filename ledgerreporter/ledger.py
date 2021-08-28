@@ -27,12 +27,12 @@ class LedgerOptions:
 
     @staticmethod
     def parse_accounts(accounts):
-        if isinstance(accounts, list):
-            return accounts
-        elif accounts:
-            return [accounts]
-        else:
+        if not accounts:
             return []
+        account_list = accounts if isinstance(accounts, list) else [accounts]
+        account_list[0] = "("+account_list[0]
+        account_list[-1] = account_list[-1]+")"
+        return account_list
 
     @staticmethod
     def parse_payee(payee):
