@@ -4,17 +4,26 @@
 import subprocess
 import csv
 
-class Ledger:
-    _bin = ["ledger"]
+from dataclasses import dataclass, field
 
-    def __init__(self, filepath, command="reg", options=["-w"], print_format=None, filter_by=None, filter_args=None, accounts=""):
-        self._command = command
-        self._options = options
-        self._filepath = self.parse_filepath(filepath)
-        self._print_format = print_format
-        self._filter_by = filter_by
-        self._filter_args = filter_args
-        self._accounts = self.parse_accounts(accounts)
+@dataclass
+class LedgerOptions:
+    files: list = field(default_factory=list)
+    accounts: list = field(default_factory=list)
+    payee: str = ""
+    amount: str = ""
+    reverse: bool = False
+    flat: bool = True
+
+    @staticmethod
+    def parse_files(files):
+        if isinstance(files, list):
+            array = []
+            for f in files:
+                array += ["-f", f]
+            return array
+        else:
+            return ["-f", filepath]
 
     @staticmethod
     def parse_accounts(accounts):
@@ -26,94 +35,79 @@ class Ledger:
             return []
 
     @staticmethod
-    def parse_filepath(filepath):
-        if isinstance(filepath, list):
-            array = []
-            for f in filepath:
-                array += ["-f", f]
-            return array
+    def parse_payee(payee):
+        if payee.startswith("not "):
+            return ["not", "payee", payee[4:]]
+        elif payee:
+            return ["payee", payee]
         else:
-            return ["-f", filepath]
-
-    @staticmethod
-    def get_format_keyword(command):
-        if command == "bal":
-            return "--balance-format"
-        elif command == "csv":
-            return "--csv-format"
-        else:
-            return "--format"
-
-    @staticmethod
-    def get_default_format(command):
-        if command == "bal":
-            return "%(quoted(account))," \
-                "%(quoted(commodity(scrub(display_total))))," \
-                "%(quoted(quantity(scrub(display_total))))\n"
-        elif command == "csv":
-            return "%(quoted(date))," \
-                "%(quoted(code))," \
-                "%(quoted(payee))," \
-                "%(quoted(display_account))," \
-                "%(quoted(commodity(scrub(display_amount))))," \
-                "%(quoted(quantity(scrub(display_amount))))," \
-                "%(quoted(cleared ? \"*\" : (pending ? \"!\" : \"\")))," \
-                "%(quoted(join(note | xact.note)))\n"
-        else:
-            return "%(quoted(date)),%(quoted(payee)),"\
-                "%(quoted(display_account))," \
-                "%(quoted(commodity(scrub(display_amount))))," \
-                "%(quoted(quantity(scrub(display_amount))))," \
-                "%(quoted(note))\n"
-
-    @classmethod
-    def generate_print_format(cls, command, print_format):
-        return [cls.get_format_keyword(command), print_format if print_format else cls.get_default_format(command)]
-
-    @staticmethod
-    def get_default_header(command):
-        if command == "bal":
-            return ["account","commodity","quantity"]
-        elif command == "csv":
-            return ["date","code","payee","account","commodity","quantity","cleared","note"]
-        else:
-            return ["date","payee","account","commodity","quantity","note"]
-
-    @staticmethod
-    def generate_filter(filter_by, filter_args):
-        if not filter_by:
             return []
 
-        if filter_by == "amount":
-            if not filter_args.startswith(("<",">","=")):
-                filter_args = "== " + filter_args
-            return ["expr", 'amount {}'.format(filter_args)]
-        elif "payee" in filter_by:
-            return filter_by.split(" ") + [filter_args]
-        elif filter_by == "comment":
-            return ["expr", "comment=~/{}/".format(filter_args)]
-        else:
-            raise Exeption("Filter not supported")
+    @staticmethod
+    def parse_amount(amount):
+        return ["expr", 'amount {}'.format(amount)] if amount else []
 
     @staticmethod
-    def generate_query(filter_expr, accounts):
-        if filter_expr and accounts:
-            return filter_expr + ["and", accounts[0]]
-        elif accounts:
-            return accounts
-        else:
-            return filter_expr or []
+    def parse_reverse(reverse):
+        return ["-r"] if reverse else []
 
-    def generate_command(self):
-        return self._bin + \
-            [self._command] + self._options + \
-            self.generate_query(self.generate_filter(self._filter_by, self._filter_args), self._accounts) + \
-            self.generate_print_format(self._command, self._print_format) + \
-            self._filepath
+    @staticmethod
+    def parse_flat(flat):
+        return ["--flat"] if flat else []
 
-    def call(self, encoding="utf8"):
-        res = subprocess.run(self.generate_command(), capture_output=True, encoding=encoding)
-        data = list(csv.reader(res.stdout.splitlines()))
-        if not self._print_format:
-            data.insert(0, self.get_default_header(self._command))
-        return data
+    def parse_conditions(self):
+        accounts = self.parse_accounts(self.accounts)
+        payee = self.parse_payee(self.payee)
+        amount = self.parse_amount(self.amount)
+        conditions = accounts
+        if len(payee):
+            if len(conditions):
+                conditions  += ["and"]
+            conditions += payee
+        if len(amount):
+            if len(conditions):
+                conditions  += ["and"]
+            conditions += amount
+        return conditions
+
+    def to_command(self):
+        return self.parse_files(self.files) + \
+            self.parse_reverse(self.reverse) + \
+            self.parse_flat(self.flat) + \
+            self.parse_conditions()
+
+def balance(options: LedgerOptions, encoding="utf8"):
+    res = call_ledger("bal", options, encoding)
+    return parse_result(get_result_header("bal"), res)
+
+def register(options: LedgerOptions, encoding="utf8"):
+    res = call_ledger("reg", options, encoding)
+    return parse_result(get_result_header("reg"), res)
+
+def get_print_format(command):
+    if command not in ["bal","reg"]: return []
+    return {
+        "bal": ["--balance-format", "%(quoted(account))," \
+                "%(quoted(commodity(scrub(display_total))))," \
+                "%(quoted(quantity(scrub(display_total))))\n"],
+        "reg": ["--format", "%(quoted(date)),%(quoted(payee)),"\
+                "%(quoted(display_account))," \
+                "%(quoted(commodity(scrub(display_amount))))," \
+                "%(quoted(quantity(scrub(display_amount))))," \
+                "%(quoted(note))\n"]
+        }[command]
+
+def get_result_header(command):
+    if command not in ["bal","reg"]: return []
+    return {
+        "bal": ("account","commodity","quantity"),
+        "reg": ("date","payee","account","commodity","quantity","note")
+    }[command]
+
+def parse_result(header, res):
+    return [dict(l) for l in csv.DictReader(res.stdout.splitlines(), fieldnames=header) if l["account"]]
+
+def call_ledger(command, options: LedgerOptions, encoding="utf8"):
+    return subprocess.run(
+        ["ledger", command] + options.to_command() + get_print_format(command), \
+        capture_output=True, encoding=encoding)

@@ -12,14 +12,7 @@ I've been checking my budget and expenses using [ledger-dashboard](https://githu
 
 ##### `report.py`
 
-- Is an example of how to use the wrapper to produce a report.
-- Usage: `python report.py <folder>`
-- The folder structure is:
-    ```
-    - <folder>
-      - <year>
-        - <year><month>.ledger
-    ```
+- Is currently broken since it's using the old version
 
 ### Test
 

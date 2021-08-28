@@ -2,46 +2,21 @@
 # -*- coding: utf-8 -*-
 
 import sys
-from ledgerreporter.ledger import Ledger
+from ledgerreporter.ledger import LedgerOptions, balance, register
 
 def main(filepath):
     ledgers = [
-        Ledger(
-            filepath=filepath,
-            command="bal",
-            accounts="Expenses"
-        ),
-        Ledger(
-            filepath=filepath,
-            accounts="Expenses",
-            filter_by="amount",
-            filter_args="JPY 100"
-        ),
-        Ledger(
-            filepath=filepath,
-            command="csv",
-            accounts="Expenses"
-        ),
-        Ledger(
-            filepath=filepath,
-            command="reg",
-            filter_by="amount",
-            filter_args="JPY 100"
-        ),
-        Ledger(
-            filepath=filepath,
-            command="bal",
-            accounts=["Food","House"]
-        )
+        balance(LedgerOptions(files=filepath, accounts=["Expenses"])),
+        register(LedgerOptions(files=filepath, accounts=["Expenses"])),
+        register(LedgerOptions(files=filepath, accounts=["Expenses"], amount="== JPY 100")),
+        register(LedgerOptions(files=filepath, accounts=["Food", "House"])),
     ]
     for ledger in ledgers:
-        print("*",ledger._command)
-        res = ledger.call()
-        for l in res:
-            print(l)
+        print("---")
+        [print(l) for l in ledger]
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         main(sys.argv[1:])
     else:
-        print("Usage: python ledger.py <ledger_file>")
+        print("Usage: python ledger.py <ledger_file> <ledger_file2>")
