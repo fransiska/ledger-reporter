@@ -6,7 +6,7 @@ import sys
 from ledgerreporter.ledger import LedgerOptions, register, balance
 from ledgerreporter.reporter import sum_amounts, sum_amounts_for_accounts, remove_accounts
 
-def get_filepaths(folder, year, month, with_monthly_file=True):
+def get_filepaths(folder, year, month, with_monthly_file=False):
     return os.path.join(folder, "{year}/{year}{month}{monthly}.ledger".format(year=year,month=month,monthly="_monthly" if with_monthly_file else ""))
 
 def get_yarikuri_expenses(filepath):
@@ -29,8 +29,8 @@ def get_total_budget(filepath):
 
 def check_monthly_yarikuri(folder, year, month):
     filepath = [
-        get_filepaths(folder, year, month),
-        get_filepaths(folder, year, month, with_monthly_file=False)]
+        get_filepaths(folder, year, month, with_monthly_file=True),
+        get_filepaths(folder, year, month)]
     next_month = ("0"+str(int(month)+1))[-2:]
     yarikuri_expenses = get_yarikuri_expenses(filepath)
     total_yarikuri_expenses = sum_amounts(yarikuri_expenses)
